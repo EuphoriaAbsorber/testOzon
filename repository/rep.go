@@ -1,15 +1,17 @@
 package repository
 
 import (
-	"main/model"
+	//"main/model"
+	"fmt"
+	"main/graph/model"
 	"sync"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type StoreInterface interface {
-	GetPosts() ([]model.Post, error)
-	CreatePost(in model.Post) error
+	GetPosts() ([]*model.Post, error)
+	CreatePost(in model.NewPost) (int, error)
 }
 
 // type Store struct {
@@ -36,18 +38,19 @@ func NewMemoryStore() StoreInterface {
 	}
 }
 
-func (ms *MemoryStorage) GetPosts() ([]model.Post, error) {
-	posts := []model.Post{}
+func (ms *MemoryStorage) GetPosts() ([]*model.Post, error) {
+	posts := []*model.Post{}
 	for _, p := range ms.posts {
-		posts = append(posts, p)
+		posts = append(posts, &p)
 	}
 	return posts, nil
 }
 
-func (ms *MemoryStorage) CreatePost(in model.Post) error {
+func (ms *MemoryStorage) CreatePost(in model.NewPost) (int, error) {
 	ms.mu.Lock()
+	id := ms.postInc
 	ms.postInc++
-	ms.posts[ms.postInc] = in
+	ms.posts[ms.postInc] = model.Post{ID: ms.postInc - 1, Title: in.Title + fmt.Sprint(id), Text: in.Text, AuthorID: in.AuthorID, IsCommentsUnabled: in.IsCommentsUnabled}
 	ms.mu.Unlock()
-	return nil
+	return id, nil
 }

@@ -1,7 +1,8 @@
 package usecase
 
 import (
-	"main/model"
+	//"main/model"
+	"main/graph/model"
 
 	rep "main/repository"
 )

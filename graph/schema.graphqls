@@ -1,0 +1,28 @@
+type User {
+    id: Int!
+    name: String!
+    email: String!
+}
+
+type Post {
+    id: Int!
+    title: String!
+    text: String!
+    authorId: Int!
+    IsCommentsUnabled: Boolean!
+}
+
+input NewPost {
+    title: String!
+    text: String!
+    authorId: Int!
+    IsCommentsUnabled: Boolean!
+}
+
+type Mutation {
+    createPost(input: NewPost!): Post!
+}
+
+type Query {
+    Posts(limit: Int = 25, offset: Int = 0): [Post!]!
+}
