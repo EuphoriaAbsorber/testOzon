@@ -11,7 +11,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 	"main/graph/model"
 	rep "main/repository"
 )
@@ -38,11 +37,9 @@ func (r *queryResolver) Posts(ctx context.Context, limit *int, offset *int) ([]*
 
 func (r *mutationResolver) CreatePost(ctx context.Context, in model.NewPost) (*model.Post, error) {
 	id, err := r.Store.CreatePost(in)
-	ans := &model.Post{ID: id, Title: in.Title + fmt.Sprint(id), Text: in.Text, AuthorID: in.AuthorID, IsCommentsUnabled: in.IsCommentsUnabled}
+	ans := model.Post{ID: id, Title: in.Title + fmt.Sprint(id), Text: in.Text, AuthorID: in.AuthorID, IsCommentsUnabled: in.IsCommentsUnabled}
 	if err != nil {
-		return ans, nil
+		return nil, err
 	}
-	log.Println(ans)
-	return nil, err
-	//return nil, nil
+	return &ans, nil
 }

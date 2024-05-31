@@ -39,18 +39,21 @@ func NewMemoryStore() StoreInterface {
 }
 
 func (ms *MemoryStorage) GetPosts() ([]*model.Post, error) {
-	posts := []*model.Post{}
-	for _, p := range ms.posts {
-		posts = append(posts, &p)
+	posts := make([]*model.Post, len(ms.posts))
+	idx := 0
+	for _, val := range ms.posts {
+		posts[idx] = &model.Post{ID: val.ID, Title: val.Title, Text: val.Text, AuthorID: val.AuthorID, IsCommentsUnabled: val.IsCommentsUnabled}
+		idx++
 	}
+	//log.Println(posts)
 	return posts, nil
 }
 
 func (ms *MemoryStorage) CreatePost(in model.NewPost) (int, error) {
 	ms.mu.Lock()
 	id := ms.postInc
+	ms.posts[ms.postInc] = model.Post{ID: ms.postInc, Title: in.Title + fmt.Sprint(id), Text: in.Text, AuthorID: in.AuthorID, IsCommentsUnabled: in.IsCommentsUnabled}
 	ms.postInc++
-	ms.posts[ms.postInc] = model.Post{ID: ms.postInc - 1, Title: in.Title + fmt.Sprint(id), Text: in.Text, AuthorID: in.AuthorID, IsCommentsUnabled: in.IsCommentsUnabled}
 	ms.mu.Unlock()
 	return id, nil
 }
