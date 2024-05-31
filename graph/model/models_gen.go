@@ -2,6 +2,14 @@
 
 package model
 
+type Comment struct {
+	ID           int    `json:"id"`
+	PostID       int    `json:"postId"`
+	ParentCommID *int   `json:"parentCommId,omitempty"`
+	Text         string `json:"text"`
+	AuthorID     int    `json:"authorId"`
+}
+
 type Mutation struct {
 }
 
@@ -21,6 +29,15 @@ type Post struct {
 }
 
 type Query struct {
+}
+
+type ResponseStatus struct {
+	Text string `json:"text"`
+}
+
+type SwitchCommsType struct {
+	PostID   int `json:"postId"`
+	AuthorID int `json:"authorId"`
 }
 
 type User struct {

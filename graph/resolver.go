@@ -6,11 +6,10 @@ package graph
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-//rep "main/repository"
-
 import (
 	"context"
 	"fmt"
+	Errors "main/errors"
 	"main/graph/model"
 	rep "main/repository"
 )
@@ -32,7 +31,6 @@ func (r *Resolver) Query() QueryResolver {
 
 func (r *queryResolver) Posts(ctx context.Context, limit *int, offset *int) ([]*model.Post, error) {
 	return r.Store.GetPosts()
-	//return nil, nil
 }
 
 func (r *mutationResolver) CreatePost(ctx context.Context, in model.NewPost) (*model.Post, error) {
@@ -42,4 +40,19 @@ func (r *mutationResolver) CreatePost(ctx context.Context, in model.NewPost) (*m
 		return nil, err
 	}
 	return &ans, nil
+}
+
+func (r *mutationResolver) SwitchCommentsCreation(ctx context.Context, input model.SwitchCommsType) (*model.ResponseStatus, error) {
+	post, err := r.Store.GetPost(input.PostID)
+	if err != nil {
+		return &model.ResponseStatus{Text: "Error"}, err
+	}
+	if post.AuthorID != input.AuthorID {
+		return &model.ResponseStatus{Text: "Error"}, Errors.ErrForbidden403
+	}
+	err = r.Store.SwitchCommentsCreation(input.PostID)
+	if err != nil {
+		return &model.ResponseStatus{Text: "Error"}, err
+	}
+	return &model.ResponseStatus{Text: "Ok"}, nil
 }

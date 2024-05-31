@@ -6,12 +6,16 @@ import (
 	"main/graph/model"
 	"sync"
 
+	Errors "main/errors"
+
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type StoreInterface interface {
 	GetPosts() ([]*model.Post, error)
 	CreatePost(in model.NewPost) (int, error)
+	GetPost(id int) (*model.Post, error)
+	SwitchCommentsCreation(id int) error
 }
 
 // type Store struct {
@@ -56,4 +60,19 @@ func (ms *MemoryStorage) CreatePost(in model.NewPost) (int, error) {
 	ms.postInc++
 	ms.mu.Unlock()
 	return id, nil
+}
+
+func (ms *MemoryStorage) GetPost(id int) (*model.Post, error) {
+	if res, ok := ms.posts[id]; ok {
+		return &res, nil
+	}
+	return nil, Errors.ErrNotFound404
+}
+
+func (ms *MemoryStorage) SwitchCommentsCreation(id int) error {
+	ms.mu.Lock()
+	ms.posts[id] = model.Post{ID: ms.posts[id].ID, Title: ms.posts[id].Title, Text: ms.posts[id].Text, AuthorID: ms.posts[id].AuthorID,
+		IsCommentsUnabled: !ms.posts[id].IsCommentsUnabled}
+	ms.mu.Unlock()
+	return nil
 }

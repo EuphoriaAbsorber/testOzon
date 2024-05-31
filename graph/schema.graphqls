@@ -9,18 +9,36 @@ type Post {
     title: String!
     text: String!
     authorId: Int!
-    IsCommentsUnabled: Boolean!
+    IsCommentsEnabled: Boolean!
+}
+
+type Comment {
+    id: Int!
+    postId: Int!
+    parentCommId: Int
+    text: String!
+    authorId: Int!
+}
+
+type ResponseStatus {
+    text: String!
 }
 
 input NewPost {
     title: String!
     text: String!
     authorId: Int!
-    IsCommentsUnabled: Boolean!
+    IsCommentsEnabled: Boolean!
+}
+
+input SwitchCommsType {
+    postId: Int!
+    authorId: Int!
 }
 
 type Mutation {
     createPost(input: NewPost!): Post!
+    switchCommentsCreation(input: SwitchCommsType!): ResponseStatus!
 }
 
 type Query {
